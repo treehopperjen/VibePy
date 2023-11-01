@@ -1,0 +1,10 @@
+VibePy: an open-source tool for conducting high-fidelity vibrational playback experiments 
+
+HOW TO RUN VIBEPY
+1. Download VibePy
+
+2. Naviage to your VibePy folder, either in terminal or using an IDE
+
+3. Install package dependencies using pip
+
+4. Run the application.py file

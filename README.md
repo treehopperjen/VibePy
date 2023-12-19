@@ -17,7 +17,7 @@ Instructions for setting up the tool and using these features are described belo
 ### Getting started
 - Download python3 which is freely available at https://www.python.org/
 - Clone the VibePy repository 
-    `clone https://github.com/treehopperjen/VibePy.git`
+    `git clone https://github.com/treehopperjen/VibePy.git`
 - Install the required python packages listed in requirements.txt 
     `pip3 install -r requirements.txt`
 - Run `application.py`

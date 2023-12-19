@@ -1,12 +1,12 @@
 """
-This is the model -  all of the data and 
-all of the functions that manipulate the data.
+This is the model -  all the data and functions that manipulate the data.
 It passes information to the viewmodel. 
 """
-import controller
+
 import compensation
 import calibration
 import playback
+
 
 # EXPERIMENT
 class Experiment:
@@ -24,10 +24,12 @@ class Experiment:
         self.audiointerface = device_num
 
     def set_transducers(self, input_channel, output_channel, sensor_type):
-        self.transducers = TransducerPair(input_channel, output_channel, sensor_type)
+        self.transducers = TransducerPair(
+            input_channel, output_channel, sensor_type)
 
     def set_stimulus(self, filename, fs, fft, low_freq, high_freq, target_amp):
-        self.stimulus = Stimulus(filename, fs, fft, low_freq, high_freq, target_amp)
+        self.stimulus = Stimulus(
+            filename, fs, fft, low_freq, high_freq, target_amp)
 
     def generate_compensation_filter(self):
         # get parameters
@@ -36,9 +38,12 @@ class Experiment:
         low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
+
         # run compensation to get filter
-        self.compensation_filter, self.compensated_filename = compensation.main(
-            fs, fft, low_freq, high_freq, device_num, input_channel, output_channel, filename)
+        self.compensation_filter, self.compensated_filename = \
+            compensation.main(
+                fs, fft, low_freq, high_freq,
+                device_num, input_channel, output_channel, filename)
 
     def generate_calibration_multiplier(self):
         # use the compensated file if there is one, if not use the original file
@@ -48,18 +53,22 @@ class Experiment:
             filename = self.stimulus.get_filename()
         # get parameters
         fs, fft = self.stimulus.get_sampling_parameters()
-        low_freq, high_freq = self.stimulus.get_frequency_parameters()
+        # low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
         target_amp = self.stimulus.get_amplitude_parameter()
         amp_conversion = self.transducers.get_sensor_conversion()
         amp_units = self.transducers.get_sensor_units()
         # run calibration to get multiplier
-        self.calibration_mulitplier, self.calibrated_filename = calibration.main(
-            fs, fft, low_freq, high_freq, device_num, input_channel, output_channel, filename, target_amp, amp_conversion, amp_units)
+        self.calibration_mulitplier, self.calibrated_filename = \
+            calibration.main(
+                fs,
+                device_num, input_channel, output_channel, filename,
+                target_amp, amp_conversion, amp_units)
 
     def play_for_experiment(self):
-        # use the calibrated file if there is one, if not use the compensated file, if not use the original file
+        # use the calibrated file if there is one, if not use the compensated
+        # file, if not use the original file
         if self.calibrated_filename is not None:
             filename = self.calibrated_filename
         elif self.compensated_filename is not None:
@@ -68,30 +77,40 @@ class Experiment:
             filename = self.stimulus.get_filename()
         # get parameters
         fs, fft = self.stimulus.get_sampling_parameters()
-        low_freq, high_freq = self.stimulus.get_frequency_parameters()
+        # low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
         # run playback to play vibrational stimulus
         playback.main(filename, fs, device_num, input_channel, output_channel)
 
     def __str__(self):
-        return (f'\n{self.name}\n'
-            f'\nHardware Parameters\nAudiointerface device num: {self.audiointerface}{"" if self.transducers is None else self.transducers}\n'
-            f'\nStimulus and Signal Parameters{"" if self.stimulus is None else self.stimulus}')
+        return (f"""
+{self.name}
+
+Hardware Parameters
+Audiointerface device num: {self.audiointerface}{
+            '' if self.transducers is None else self.transducers}
+
+Stimulus and Signal Parameters{
+            '' if self.stimulus is None else self.stimulus}"""
+                )
+
 
 class TransducerPair:
 
-    sensor_options = [[0, 'accelerometer 100 mV/G (1x gain)', 'm/s^2', 98],
-     [1, 'accelerometer 100 mV/G (10x gain)', 'm/s^2', 9.8],
-     [2, 'accelerometer 100 mV/G (100x gain)', 'm/s^2', 0.98],
-     [3, 'laser 2.5 mm/s/V', 'mm/s', 2.5],
-     [4, 'laser 5 mm/s/V', 'mm/s', 5],
-     [5, 'laser 25 mm/s/V', 'mm/s', 25],
-     [6, 'uncalibrated sensor mV', 'mV', 1000]]
+    sensor_options = [
+        [0, 'accelerometer 100 mV/G (1x gain)', 'm/s^2', 98],
+        [1, 'accelerometer 100 mV/G (10x gain)', 'm/s^2', 9.8],
+        [2, 'accelerometer 100 mV/G (100x gain)', 'm/s^2', 0.98],
+        [3, 'laser 2.5 mm/s/V', 'mm/s', 2.5],
+        [4, 'laser 5 mm/s/V', 'mm/s', 5],
+        [5, 'laser 25 mm/s/V', 'mm/s', 25],
+        [6, 'uncalibrated sensor mV', 'mV', 1000]
+    ]
 
     def __init__(self, input_channel, output_channel, sensor_type):
-        self.input_channel = input_channel # sensor channel
-        self.output_channel = output_channel # playback device channel
+        self.input_channel = input_channel    # sensor channel
+        self.output_channel = output_channel  # playback device channel
         self.sensor_type = sensor_type
 
     def get_channels(self):
@@ -114,12 +133,14 @@ class TransducerPair:
     def __str__(self):
         sensor_amp_units = self.get_sensor_units()
         sensor_amp_conversion = self.get_sensor_conversion()
-        return(f'\nSensor channel: {self.input_channel}'
-            f'\nPlayback device channel: {self.output_channel}'
-            f'\nSensor: {self.sensor_type}'
-            f'\nSensor units: {sensor_amp_units}'
-            f'\nSensor amplitude conversion: {sensor_amp_conversion}'
-        )
+        return(f"""
+Sensor channel: {self.input_channel}
+Playback device channel: {self.output_channel}
+Sensor: {self.sensor_type}
+Sensor units: {sensor_amp_units}
+Sensor amplitude conversion: {sensor_amp_conversion}"""
+               )
+
 
 class Stimulus:
     def __init__(self, filename, fs, fft, low_freq, high_freq, target_amp):
@@ -143,10 +164,14 @@ class Stimulus:
         return self.target_amp
 
     def __str__(self):
-        return(f'\nStimulus file: {self.filename}'
-            f'\nfs: {self.fs}'
-            f'\nfft: {self.fft}'
-            f'\nlow frequency: {self.low_freq}'
-            f'\nhigh frequency: {self.high_freq}'
-            f'\n{"" if self.target_amp is None else f"target amplitude: {self.target_amp}"}'
-        )
+        return(
+            f"""
+Stimulus file: {self.filename}
+fs: {self.fs}
+fft: {self.fft}
+low frequency: {self.low_freq}
+high frequency: {self.high_freq}
+""" +
+            '' if self.target_amp is None else
+            f'target amplitude: {self.target_amp}'
+               )

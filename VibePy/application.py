@@ -21,7 +21,7 @@ def main():
     print(f'{ln}GENERAL EXPERIMENT PARAMETERS {divider}{ln}')
     experiment_name = request_experiment_name()
     compensate, calibrate, playback = request_experiment_actions()
-    controller = Controller(experiment_name, compensate, calibrate, playback)
+    controller = Controller(experiment_name)
     # Above line initializes experiment
     
     if experiment_name == 'testing':

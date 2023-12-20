@@ -104,9 +104,9 @@ def compensate(stimulus, compensation_filter):
     compensated_stimulus = signal.lfilter(compensation_filter, 1, stimulus)
     
     # If the compensated stimulus would clip, lower the overall amplitude
-    if abs(max(compensated_stimulus)) > 1:
+    if max(abs(compensated_stimulus)) > 1:
         compensated_stimulus = compensated_stimulus / (
-                1.1 * abs(max(compensated_stimulus)))
+                1.1 * max(abs(compensated_stimulus)))
 
     return compensated_stimulus
 

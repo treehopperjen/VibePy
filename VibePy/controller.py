@@ -8,7 +8,7 @@ from experiment import Experiment
 
 
 class Controller:
-    def __init__(self, experiment_name, compensate, calibrate, playback):
+    def __init__(self, experiment_name):
         self.experiment = Experiment(experiment_name)
 
     def add_audiointerface(self, device_num):

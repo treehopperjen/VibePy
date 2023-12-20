@@ -5,11 +5,11 @@ target amplitude, and applies that multiplier to the stimulus.
 """
 
 import soundfile as sf
-import sounddevice as sd
 import os
 import numpy as np
+from scipy import signal
 from playback import play_and_record
-from plotting import plot_waveforms
+from plotting import plot_waveforms, plot_amplitude_spectra
 
 
 def generate_click(fs):
@@ -34,7 +34,7 @@ def get_time_delay(fs, device, input_channel, output_channel):
     recorded_click = play_and_record(
         click, fs, device, input_channel, output_channel,
         with_padding=True)
-    sd.wait()
+
     # get time delay
     time_delay = np.argmax(recorded_click)-fs
     return time_delay
@@ -136,9 +136,25 @@ def find_peaks(recording_of_ladder, recording_segment_locations,
         for start, end in recording_segment_locations
     ]
 
+def get_amplitude_spectrum(sound, fs, nfft, lo_hi=None):
+    """
+    get_amplitude_spectrum
+    Generates an amplitude spectrum of a selection of sound.
+    """
+    # `frequencies` is frequency samples of amplitude spectrum
+    # `amplitudes` is power spectral density of amplitude spectrum
+    frequencies, amplitudes = signal.welch(
+        sound, fs, window='hamming',
+        nperseg=nfft, scaling='spectrum', detrend=False)
+
+    if lo_hi is not None:   # Limit bandwidth, if requested
+        frequencies = frequencies[lo_hi[0]:lo_hi[1]]
+        amplitudes = amplitudes[lo_hi[0]:lo_hi[1]]
+
+    return frequencies, np.power(amplitudes, 0.5)
 
 def main(fs, device_num, input_channel, output_channel,
-         filename, target_amp, amp_conversion, amp_units):
+         filename, target_amp, amp_conversion, fft):
 
     print(f'Calibrating {filename}')
 
@@ -193,8 +209,9 @@ def main(fs, device_num, input_channel, output_channel,
         with_padding=True)
 
     # Convert amplitude
-    stim1 = playback * amp_conversion
-    stim2 = recording_of_calibrated_playback * amp_conversion
+    stim1 = playback * amp_conversion # stimulus
+    stim2 = recording_of_calibrated_playback * amp_conversion # recording of calibrated stimylus
+    stim3 = calibrated_playback * amp_conversion # calibrated stimulus
 
     # Determine peak
     measured_peak1 = round(max(abs(stim1)), 2)
@@ -206,8 +223,17 @@ def main(fs, device_num, input_channel, output_channel,
         'Amplitude',
         f'Waveform of Stimulus.\nMeasured peak: {measured_peak1}',
         'Waveform of Recorded, Calibrated Stimulus.\n'
-        f'Measured peak: {measured_peak2}. Target: {target_amp}')
-    
+        f'Measured peak: {measured_peak2}.'
+        f'Target: {target_amp}.')
+
+    stim1_freq, stim1_amp = get_amplitude_spectrum(stim1, fs, fft) # stimulus
+    stim3_freq, stim3_amp = get_amplitude_spectrum(stim3, fs, fft) # calibrated stimulus
+
+    plot_amplitude_spectra(
+            [stim1_freq, stim3_freq],
+            [stim1_amp, stim3_amp],
+            ['Stimulus', 'Calibrated Stimulus'])
+
     # save calibrated stimulus
     file_basename = os.path.splitext(filename)[0]
     calibrated_filename = f'calibrated_{file_basename}.wav'

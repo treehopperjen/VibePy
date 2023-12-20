@@ -18,13 +18,13 @@ Instructions for setting up the tool and using these features are described belo
 - Download python3 which is freely available at https://www.python.org/
 - Clone the VibePy repository 
     `git clone https://github.com/treehopperjen/VibePy.git`
-- Install the required python packages listed in requirements.txt 
+- Install the required python packages listed in [requirements.txt](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/requirements.txt)
     `pip3 install -r requirements.txt`
 - Run `application.py`
 
 ### Using VibePy
 
-VibePy is a command-line interface application that is run from `application.py`. After running the application, select which features to use and enter parameters of the experiment (which are described in the article cited above). The features can be used individually or together and, when used together, they will execute in the following order:
+VibePy is a command-line interface application that is run from [application.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/application.py). After running the application, select which features to use and enter parameters of the experiment (which are described in the article cited above). The features can be used individually or together and, when used together, they will execute in the following order:
 
     1. Measure and compensate for filtering
     2. Calibrate playback amplitude
@@ -34,7 +34,7 @@ VibePy is a command-line interface application that is run from `application.py`
 
 This module measures undesired filtering by the playback device and substrate, and then generates a digital filter (i.e. compensation filter) that is the inverse of the undesired filtering. This compensation filter can then be applied to a stimulus before it is played for the experiment, such that the detected stimulus has the same frequency characteristics as the intended stimulus. 
 
-The code for this module is in `compensate.py` and works iteratively by:
+The code for this module is in [compensate.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/compensation.py) and works iteratively by:
 
 - Playing and recording two seconds of noise
 - Measuring the filtering of the noise
@@ -48,7 +48,7 @@ The code for this module is in `compensate.py` and works iteratively by:
 
 This module calibrates the amplitude of the playback stimulus by estimating an amplitude multiplier that can be applied to the stimulus to match the peak amplitude of the played stimulus to the target amplitude. 
 
-The code for this module is in `calibrate.py` and works by:
+The code for this module is in [calibration.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/calibration.py) and works by:
 
 - Playing and recording the stimulus (or compensated stimulus, if available)
 - Locating the recorded peak amplitude in the stimulus and extracting it
@@ -60,5 +60,5 @@ The code for this module is in `calibrate.py` and works by:
 
 This module plays and records the stimulus. It will use the compensated, calibrated, or compensated/calibrated stimulus if it is available. 
 
-The code for this module is in `playback.py`
+The code for this module is in [playback.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/playback.py)
 

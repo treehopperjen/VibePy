@@ -34,7 +34,7 @@ VibePy is a command-line interface application that is run from [application.py]
 
 This module measures undesired filtering by the playback device and substrate, and then generates a digital filter (i.e. compensation filter) that is the inverse of the undesired filtering. This compensation filter can then be applied to a stimulus before it is played for the experiment, such that the detected stimulus has the same frequency characteristics as the intended stimulus. 
 
-The code for this module is in [compensate.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/compensation.py) and works iteratively by:
+The code for this module is in [compensation.py](https://github.com/treehopperjen/VibePy/blob/96d738a79f68ac0a0e58b7517245666b043cd249/VibePy/compensation.py) and works iteratively by:
 
 - Playing and recording two seconds of noise
 - Measuring the filtering of the noise

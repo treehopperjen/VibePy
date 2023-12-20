@@ -25,6 +25,7 @@ def main():
     # Above line initializes experiment
     
     if experiment_name == 'testing':
+        
         device_num = int(get_testing_parameter('device_num'))
         controller.add_audiointerface(device_num)
 
@@ -45,10 +46,12 @@ def main():
 
     else:
         print(f'{ln}HARDWARE PARAMETERS {divider}{ln}')
-        device_num = request_audiointerface()
+        input_device_num, output_device_num = request_audiointerface()
+        device_num = (input_device_num, output_device_num)
         controller.add_audiointerface(device_num)
 
-        input_channel, output_channel = request_transducer_channels()
+        input_channel = request_input_channel(input_device_num)
+        output_channel = request_output_channel(output_device_num)
         sensor_number = request_sensor()
         sensor_type = get_sensor_type(sensor_number)
         sensor_amp_units = get_sensor_units(sensor_number)
@@ -109,17 +112,24 @@ def request_experiment_actions():
 
 
 def request_audiointerface():
-    print(f'Find your audio interface below...\n', sd.query_devices())
-    device_num = int(input(f'{ln}{tab}Enter audio interface device number: '))
-    return device_num
+    print(f'Find your audio device(s) below...\n', sd.query_devices())
+    print(f'{ln}If you are using the same device for output and input'
+          ' (e.g. audio interface), enter that number for both.')
+    input_device_num = int(input(f'{ln}Input device number: '))
+    output_device_num = int(input(f'Output device number: '))
+    return input_device_num, output_device_num
 
 
-def request_transducer_channels():
-    print(f'{ln}Enter the channel numbers your are using on your audio'
-          'interface...')
-    output_channel = int(input(f'{tab}Playback device channel: '))
-    input_channel = int(input(f'{tab}Sensor channel: '))
-    return input_channel, output_channel
+def request_output_channel(output_device_num):
+    max_out = sd.query_devices()[output_device_num].get('max_output_channels')
+    output_channel = int(input(f'{tab}Playback device channel ({max_out} available): '))
+    return output_channel
+
+
+def request_input_channel(input_device_num):
+    max_in = sd.query_devices()[input_device_num].get('max_input_channels')
+    input_channel = int(input(f'{tab}Sensor channel ({max_in} available): '))
+    return input_channel
 
 
 def request_sensor():

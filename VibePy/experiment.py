@@ -53,18 +53,16 @@ class Experiment:
             filename = self.stimulus.get_filename()
         # get parameters
         fs, fft = self.stimulus.get_sampling_parameters()
-        # low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
         target_amp = self.stimulus.get_amplitude_parameter()
         amp_conversion = self.transducers.get_sensor_conversion()
-        amp_units = self.transducers.get_sensor_units()
         # run calibration to get multiplier
         self.calibration_mulitplier, self.calibrated_filename = \
             calibration.main(
                 fs,
                 device_num, input_channel, output_channel, filename,
-                target_amp, amp_conversion, amp_units)
+                target_amp, amp_conversion, fft)
 
     def play_for_experiment(self):
         # use the calibrated file if there is one, if not use the compensated
@@ -91,7 +89,7 @@ Hardware Parameters
 Audiointerface device num: {self.audiointerface}{
             '' if self.transducers is None else self.transducers}
 
-Stimulus and Signal Parameters{
+Stimulus and Signal Parameters\n{
             '' if self.stimulus is None else self.stimulus}"""
                 )
 

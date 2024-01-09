@@ -1,11 +1,16 @@
 testing_parameters.txt
 Enter the experiment name as 'testing' if you want to use these settings. 
 
-device_num = 0
+These are the device number that your sensor and playback device are connected to in the list. 
+input_device_num = 0
+output_device_num = 0
 
+These are the channels that your hardware is connect to. 
 input_channel = 0
 output_channel = 0
-sensor_number = 0 <- this is the number associated with the sensor option in the list at the bottom of this file
+
+This is the number associated with the sensor option in the list at the bottom of this file
+sensor_number = 0 
 
 stimulus_filename = file.wav
 fs = 0

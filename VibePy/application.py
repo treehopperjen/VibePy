@@ -26,7 +26,9 @@ def main():
     
     if experiment_name == 'testing':
         
-        device_num = int(get_testing_parameter('device_num'))
+        input_device_num = int(get_testing_parameter('input_device_num'))
+        output_device_num = int(get_testing_parameter('output_device_num'))
+        device_num = (input_device_num, output_device_num)
         controller.add_audiointerface(device_num)
 
         input_channel = int(get_testing_parameter('input_channel'))
@@ -128,7 +130,7 @@ def request_output_channel(output_device_num):
 
 def request_input_channel(input_device_num):
     max_in = sd.query_devices()[input_device_num].get('max_input_channels')
-    input_channel = int(input(f'{tab}Sensor channel ({max_in} available): '))
+    input_channel = int(input(f'{ln}{tab}Sensor channel ({max_in} available): '))
     return input_channel
 
 

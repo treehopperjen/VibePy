@@ -4,6 +4,7 @@ It passes information between the user and the viewmodel.
 """
 
 import sys
+from os import path
 import sounddevice as sd
 from controller import Controller
 from experiment import TransducerPair
@@ -19,33 +20,34 @@ def main():
     print(f'{ln}{divider} Welcome to VibePy! {divider}{ln}')
     
     print(f'{ln}GENERAL EXPERIMENT PARAMETERS {divider}{ln}')
+    # Initialize experiment
     experiment_name = request_experiment_name()
     compensate, calibrate, playback = request_experiment_actions()
     controller = Controller(experiment_name)
-    # Above line initializes experiment
     
-    if experiment_name == 'testing':
-        
-        input_device_num = int(get_testing_parameter('input_device_num'))
-        output_device_num = int(get_testing_parameter('output_device_num'))
+    # Get parameters from a file
+    if path.exists(experiment_name):
+        input_device_num = int(get_testing_parameter(experiment_name, 'input_device_num'))
+        output_device_num = int(get_testing_parameter(experiment_name, 'output_device_num'))
         device_num = (input_device_num, output_device_num)
         controller.add_audiointerface(device_num)
 
-        input_channel = int(get_testing_parameter('input_channel'))
-        output_channel = int(get_testing_parameter('output_channel'))
-        sensor_number = int(get_testing_parameter('sensor_number'))
+        input_channel = int(get_testing_parameter(experiment_name, 'input_channel'))
+        output_channel = int(get_testing_parameter(experiment_name, 'output_channel'))
+        sensor_number = int(get_testing_parameter(experiment_name, 'sensor_number'))
         sensor_type = get_sensor_type(sensor_number)
         controller.add_transducers(input_channel, output_channel, sensor_type)
 
-        stimulus_filename = get_testing_parameter('stimulus_filename')
-        fs = int(get_testing_parameter('fs'))
-        fft = int(get_testing_parameter('fft'))
-        low_freq = int(get_testing_parameter('low_freq'))
-        high_freq = int(get_testing_parameter('high_freq'))
-        target_amp = float(get_testing_parameter('target_amp'))
+        stimulus_filename = get_testing_parameter(experiment_name, 'stimulus_filename')
+        fs = int(get_testing_parameter(experiment_name, 'fs'))
+        fft = int(get_testing_parameter(experiment_name, 'fft'))
+        low_freq = int(get_testing_parameter(experiment_name, 'low_freq'))
+        high_freq = int(get_testing_parameter(experiment_name, 'high_freq'))
+        target_amp = float(get_testing_parameter(experiment_name, 'target_amp'))
         controller.add_stimulus(stimulus_filename, fs, fft,
                                 low_freq, high_freq, target_amp)
 
+    # Get parameters from user
     else:
         print(f'{ln}HARDWARE PARAMETERS {divider}{ln}')
         input_device_num, output_device_num = request_audiointerface()
@@ -71,7 +73,7 @@ def main():
 
     if continue_request() is not True:
         print('Goodbye.')
-        exit()
+        sys.exit()
 
     if compensate: 
         print(f'{ln}{divider} Measuring and compensating for unwanted filtering'
@@ -88,7 +90,7 @@ def main():
 
 
 def request_experiment_name():
-    experiment_name = input(f'Experiment name: ')
+    experiment_name = input(f'Experiment name (or parameters file name): ')
     return experiment_name
 
 
@@ -96,19 +98,18 @@ def request_experiment_actions():
     print(f'{ln}Do you want to... (y/n)')
     compensate = input(f'{tab}Measure and compensate for unwanted filtering? ')
     calibrate = input(f'{tab}Calibrate playback amplitude? ')
-    # but cant calibrate if you dont compensate first?
     playback = input(f'{tab}Play vibrational stimuli? ')
 
     compensate = compensate.lower() == 'y'
     calibrate = calibrate.lower() == 'y'
     playback = playback.lower() == 'y'
 
-    if compensate:
-        print("compensate", compensate)
-    if calibrate:
-        print("calibrate", calibrate)
-    if playback:
-        print("playback", playback)
+    # if compensate:
+    #     print("compensate", compensate)
+    # if calibrate:
+    #     print("calibrate", calibrate)
+    # if playback:
+    #     print("playback", playback)
     
     return compensate, calibrate, playback
 
@@ -176,10 +177,10 @@ def continue_request():
     return cont.lower() == 'y'
 
 
-def get_testing_parameter(parameter):
+def get_testing_parameter(file_name, parameter):
 
     try:
-        with open('testing_parameters.txt') as file:
+        with open(file_name) as file:
 
             for line in file:
                 try:
@@ -195,7 +196,7 @@ def get_testing_parameter(parameter):
                   f'{parameter} = your value.', file=sys.stderr)
 
     except Exception as exc:
-        print(f'Error reading testing_parameters.txt: {exc}', file=sys.stderr)
+        print(f'Error reading {file_name}: {exc}', file=sys.stderr)
 
     return 0    # Requested param wasn't found or there was an error
             

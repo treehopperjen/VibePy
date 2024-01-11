@@ -42,7 +42,7 @@ The code for this module is in `compensate.py` and works iteratively by:
 - Applying the digital filter to the noise to create compensated noise
 - Playing and recording the compensated noise to evaluate whether the digital filter worked
 
-**Evaluate:** If the compensation filter is accurate, the shape of the amplitude spectra of the original noise and the recorded, compensated noise should match. Otherwise, another round of compensation may be necessary to fine-tune the compensation filter. *See the article cited above for more details.* 
+**Evaluate:** If the compensation filter is accurate, the shape of the amplitude spectra of the original noise and the recorded, compensated noise should match. Otherwise, another round of compensation may be necessary to fine-tune the compensation filter. Note that the overall amplitude of the noise and the recorded, compensated noise may differ because amplitude has not been calibrated yet. 
 
 **Calibrate playback amplitude**
 

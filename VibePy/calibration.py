@@ -153,12 +153,23 @@ def get_amplitude_spectrum(sound, fs, nfft, lo_hi=None):
 
     return frequencies, np.power(amplitudes, 0.5)
 
-def main(fs, device_num, input_channel, output_channel,
-         filename, target_amp, amp_conversion, fft):
+def frequency2samples(freq, fs, fft):
+    """
+    frequency2samples
+    Converts Hz to samples
+    """
+    return int(np.floor(freq/(fs/fft)))
+
+def main(fs, device_num, input_channel, output_channel, filename, 
+         target_amp, amp_conversion, fft, low_freq, high_freq):
 
     print(f'Calibrating {filename}')
 
     playback, playback_fs = sf.read(filename)
+
+    # convert the units of low and high frequency from Hz to samples
+    lo = frequency2samples(low_freq, fs, fft)
+    hi = frequency2samples(high_freq, fs, fft)
 
     # calculate the time delay between the playback and recording
     time_delay = get_time_delay(fs, device_num, input_channel, output_channel)
@@ -226,8 +237,8 @@ def main(fs, device_num, input_channel, output_channel,
         f'Measured peak: {measured_peak2}.'
         f'Target: {target_amp}.')
 
-    stim1_freq, stim1_amp = get_amplitude_spectrum(stim1, fs, fft) # stimulus
-    stim3_freq, stim3_amp = get_amplitude_spectrum(stim3, fs, fft) # calibrated stimulus
+    stim1_freq, stim1_amp = get_amplitude_spectrum(stim1, fs, fft, [lo, hi]) # stimulus
+    stim3_freq, stim3_amp = get_amplitude_spectrum(stim3, fs, fft, [lo, hi]) # calibrated stimulus
 
     plot_amplitude_spectra(
             [stim1_freq, stim3_freq],

@@ -70,13 +70,14 @@ class Experiment:
         input_channel, output_channel = self.transducers.get_channels()
         target_amp = self.stimulus.get_amplitude_parameter()
         amp_conversion = self.transducers.get_sensor_conversion()
-        
+        low_freq, high_freq = self.stimulus.get_frequency_parameters()
+
         # Calculate calibration multiplier and calibrated stimulus
         self.calibration_mulitplier, self.calibrated_filename = \
             calibration.main(
                 fs,
                 device_num, input_channel, output_channel, filename,
-                target_amp, amp_conversion, fft)
+                target_amp, amp_conversion, fft, low_freq, high_freq)
 
     def play_for_experiment(self):
         """
@@ -105,7 +106,7 @@ class Experiment:
 {self.name}
 
 Hardware Parameters
-Audiointerface device num: {self.audiointerface}{
+Device num: {self.audiointerface}{
             '' if self.transducers is None else self.transducers}
 
 Stimulus and Signal Parameters\n{

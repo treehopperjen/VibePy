@@ -1,7 +1,7 @@
 testing_parameters.txt
-Enter the experiment name as 'testing' if you want to use these settings. 
+Create copies of this file with different names to save different parameters.
 
-These are the device number that your sensor and playback device are connected to in the list. 
+These are the device number that your sensor and playback device are connected to in the list.
 input_device_num = 0
 output_device_num = 0
 

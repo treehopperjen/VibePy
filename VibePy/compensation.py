@@ -156,7 +156,7 @@ def main(fs, fft, low_freq, high_freq, device, input_channel, output_channel,
             recording_of_compensated_noise, fs, fft, [lo, hi])
         plot_amplitude_spectra(
             [stim1_freq, stim2_freq],
-            [stim1_amp, stim2_amp],
+            [stim1_amp, stim2_amp + np.mean(stim1_amp) - np.mean(stim2_amp)],
             ['Noise', 'Recorded, Compensated Noise'])
         
         print("\nWould you like to compensate again? (y/n)")

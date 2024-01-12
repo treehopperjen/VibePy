@@ -40,8 +40,8 @@ def plot_amplitude_spectra(freqs, amps, names):
     """
 
     # Determine the plot's y-axis range
-    plt_min = min([min(amp) for amp in amps])
-    plt_max = max([max(amp) for amp in amps])
+    plt_min = min([min(amp - 0.2*min(amp)) for amp in amps])
+    plt_max = max([max(amp + 0.2*min(amp)) for amp in amps])
 
     # Plot
     plt.figure(figsize=(10, 7))

@@ -249,5 +249,12 @@ def main(fs, device_num, input_channel, output_channel, filename,
     file_basename = os.path.splitext(filename)[0]
     calibrated_filename = f'calibrated_{file_basename}.wav'
     sf.write(calibrated_filename, calibrated_playback, fs)
+
+    # check for clipping
+    if max(abs(calibrated_playback)==1):
+        clipping_message = """NOTE: the saved stimulus file is clipped. 
+            Consider re-running the compensation & calibration procedure after increasing 
+            the amplifier gain or lowering the target amplitude."""
+        print(clipping_message) 
     
     return multiplier, calibrated_filename

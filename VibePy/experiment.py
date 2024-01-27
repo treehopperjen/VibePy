@@ -65,6 +65,7 @@ class Experiment:
             filename = self.stimulus.get_filename()
         
         # Get parameters
+        original_file = self.stimulus.get_filename()
         fs, fft = self.stimulus.get_sampling_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
@@ -75,7 +76,7 @@ class Experiment:
         # Calculate calibration multiplier and calibrated stimulus
         self.calibration_mulitplier, self.calibrated_filename = \
             calibration.main(
-                fs,
+                fs, original_file,
                 device_num, input_channel, output_channel, filename,
                 target_amp, amp_conversion, fft, low_freq, high_freq)
 

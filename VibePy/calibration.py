@@ -160,11 +160,11 @@ def frequency2samples(freq, fs, fft):
     """
     return int(np.floor(freq/(fs/fft)))
 
-def main(fs, device_num, input_channel, output_channel, filename, 
-         target_amp, amp_conversion, fft, low_freq, high_freq):
+def main(fs, original_filename, device_num, input_channel, output_channel, 
+         filename, target_amp, amp_conversion, fft, low_freq, high_freq):
 
     print(f'Calibrating {filename}')
-
+    original_stimulus, original_fs = sf.read(original_filename)
     playback, playback_fs = sf.read(filename)
 
     # convert the units of low and high frequency from Hz to samples
@@ -220,7 +220,7 @@ def main(fs, device_num, input_channel, output_channel, filename,
         with_padding=True)
 
     # Convert amplitude
-    stim1 = playback * amp_conversion # stimulus
+    stim1 = original_stimulus * amp_conversion # stimulus
     stim2 = recording_of_calibrated_playback * amp_conversion # recording of calibrated stimylus
     stim3 = calibrated_playback * amp_conversion # calibrated stimulus
 

@@ -223,26 +223,26 @@ def main(fs, original_filename, device_num, input_channel, output_channel,
     stim1 = original_stimulus * amp_conversion # stimulus
     stim2 = recording_of_calibrated_playback * amp_conversion # recording of calibrated stimylus
     stim3 = calibrated_playback * amp_conversion # calibrated stimulus
+    amp_adjusted_stim1 = stim1 * (max(stim2)/max(stim1)) # equalize amplitudes to facilitate comparison of spectra
 
     # Determine peak
-    measured_peak1 = round(max(abs(stim1)), 2)
     measured_peak2 = round(max(abs(stim2)), 2)
 
     # Plot
     plot_waveforms(
         fs, stim1, stim2,
         'Amplitude',
-        f'Waveform of Stimulus.\nMeasured peak: {measured_peak1}',
+        f'Waveform of Stimulus.',
         'Waveform of Recorded, Calibrated Stimulus.\n'
         f'Measured peak: {measured_peak2}.'
         f'Target: {target_amp}.')
 
-    stim1_freq, stim1_amp = get_amplitude_spectrum(stim1, fs, fft, [lo, hi]) # stimulus
-    stim3_freq, stim3_amp = get_amplitude_spectrum(stim3, fs, fft, [lo, hi]) # calibrated stimulus
+    stim1_freq, stim1_amp = get_amplitude_spectrum(amp_adjusted_stim1, fs, fft, [lo, hi]) # stimulus
+    stim2_freq, stim2_amp = get_amplitude_spectrum(stim2, fs, fft, [lo, hi]) # calibrated stimulus
 
     plot_amplitude_spectra(
-            [stim1_freq, stim3_freq],
-            [stim1_amp, stim3_amp],
+            [stim1_freq, stim2_freq],
+            [stim1_amp, stim2_amp],
             ['Stimulus', 'Calibrated Stimulus'])
 
     # save calibrated stimulus

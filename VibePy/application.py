@@ -25,30 +25,38 @@ def main():
     compensate, calibrate, playback = request_experiment_actions()
     controller = Controller(experiment_name)
     
-    # Get parameters from a file
-    if path.exists(experiment_name):
-        input_device_num = int(get_testing_parameter(experiment_name, 'input_device_num'))
-        output_device_num = int(get_testing_parameter(experiment_name, 'output_device_num'))
-        device_num = (input_device_num, output_device_num)
-        controller.add_audiointerface(device_num)
+    provide_param_file = request_provide_param_file()
+    
+    if provide_param_file:
+        param_file_name = request_param_file_name()
+        
+        # Get parameters from a file
+        if not path.exists(param_file_name):
+            print(f'{ln}{param_file_name} does not exist. Enter parameters below. ')
+            provide_param_file = False
+        else:
+            input_device_num = int(get_testing_parameter(param_file_name, 'input_device_num'))
+            output_device_num = int(get_testing_parameter(param_file_name, 'output_device_num'))
+            device_num = (input_device_num, output_device_num)
+            controller.add_audiointerface(device_num)
 
-        input_channel = int(get_testing_parameter(experiment_name, 'input_channel'))
-        output_channel = int(get_testing_parameter(experiment_name, 'output_channel'))
-        sensor_number = int(get_testing_parameter(experiment_name, 'sensor_number'))
-        sensor_type = get_sensor_type(sensor_number)
-        controller.add_transducers(input_channel, output_channel, sensor_type)
+            input_channel = int(get_testing_parameter(param_file_name, 'input_channel'))
+            output_channel = int(get_testing_parameter(param_file_name, 'output_channel'))
+            sensor_number = int(get_testing_parameter(param_file_name, 'sensor_number'))
+            sensor_type = get_sensor_type(sensor_number)
+            controller.add_transducers(input_channel, output_channel, sensor_type)
 
-        stimulus_filename = get_testing_parameter(experiment_name, 'stimulus_filename')
-        fs = int(get_testing_parameter(experiment_name, 'fs'))
-        fft = int(get_testing_parameter(experiment_name, 'fft'))
-        low_freq = int(get_testing_parameter(experiment_name, 'low_freq'))
-        high_freq = int(get_testing_parameter(experiment_name, 'high_freq'))
-        target_amp = float(get_testing_parameter(experiment_name, 'target_amp'))
-        controller.add_stimulus(stimulus_filename, fs, fft,
-                                low_freq, high_freq, target_amp)
+            stimulus_filename = get_testing_parameter(param_file_name, 'stimulus_filename')
+            fs = int(get_testing_parameter(param_file_name, 'fs'))
+            fft = int(get_testing_parameter(param_file_name, 'fft'))
+            low_freq = int(get_testing_parameter(param_file_name, 'low_freq'))
+            high_freq = int(get_testing_parameter(param_file_name, 'high_freq'))
+            target_amp = float(get_testing_parameter(param_file_name, 'target_amp'))
+            controller.add_stimulus(stimulus_filename, fs, fft,
+                                    low_freq, high_freq, target_amp)
 
     # Get parameters from user
-    else:
+    if not provide_param_file:
         print(f'{ln}HARDWARE PARAMETERS {divider}{ln}')
         input_device_num, output_device_num = request_audiointerface()
         device_num = (input_device_num, output_device_num)
@@ -90,7 +98,7 @@ def main():
 
 
 def request_experiment_name():
-    experiment_name = input(f'Experiment name (or parameters file name): ')
+    experiment_name = input(f'Experiment name: ')
     return experiment_name
 
 
@@ -113,10 +121,18 @@ def request_experiment_actions():
     
     return compensate, calibrate, playback
 
+def request_provide_param_file():
+    provide_param_file = input(f'{ln}Do you want to use a saved parameters file?: ')
+    provide_param_file = provide_param_file.lower() == 'y'
+    return provide_param_file
+
+def request_param_file_name():
+    param_file_name = input(f'Parameters file name: ')
+    return param_file_name
 
 def request_audiointerface():
     print(f'Find your audio device(s) below...\n', sd.query_devices())
-    print(f'{ln}If you are using the same device for output and input'
+    print(f'{ln}If you are using the same device for input and output'
           ' (e.g. audio interface), enter that number for both.')
     input_device_num = int(input(f'{ln}Input device number: '))
     output_device_num = int(input(f'Output device number: '))

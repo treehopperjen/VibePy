@@ -154,10 +154,17 @@ def main(fs, fft, low_freq, high_freq, device, input_channel, output_channel,
         stim1_freq, stim1_amp = get_amplitude_spectrum(noise, fs, fft, [lo, hi])
         stim2_freq, stim2_amp = get_amplitude_spectrum(
             recording_of_compensated_noise, fs, fft, [lo, hi])
+        
+        spectral_difference = stim1_amp - (stim2_amp + np.mean(stim1_amp) - np.mean(stim2_amp))
+        max_diff = np.max(abs(spectral_difference))
+        average_diff = np.mean(spectral_difference)
+        print(f'\nDifference between spectra: \navgerage difference = {average_diff} dB \nmax difference = {max_diff} dB')
+
         plot_amplitude_spectra(
             [stim1_freq, stim2_freq],
             [stim1_amp, stim2_amp + np.mean(stim1_amp) - np.mean(stim2_amp)],
-            ['Noise', 'Recorded, Compensated Noise'])
+            ['Noise', 'Recorded, Compensated Noise'],
+            f'Difference between spectra: avg difference = {float(f"{average_diff:.1g}"):g} dB, max difference = {float(f"{max_diff:.1g}"):g} dB')
         
         print("\nWould you like to compensate again? (y/n)")
         iterate_again = input()

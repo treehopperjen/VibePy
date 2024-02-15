@@ -32,7 +32,7 @@ def plot_waveforms(fs, stim1, stim2, ylabel, title1, title2):
     plt.show()
 
 
-def plot_amplitude_spectra(freqs, amps, names):
+def plot_amplitude_spectra(freqs, amps, names, caption=None):
     """
     plot_amplitude_spectra
     plots amplitude spectra of stimuli with frequency (Hz) on the x-axis and
@@ -40,8 +40,8 @@ def plot_amplitude_spectra(freqs, amps, names):
     """
 
     # Determine the plot's y-axis range
-    plt_min = min([min(amp) for amp in amps])
-    plt_max = max([max(amp) for amp in amps])
+    plt_min = min([min(amp - 0.2*min(amp)) for amp in amps])
+    plt_max = max([max(amp + 0.2*min(amp)) for amp in amps])
 
     # Plot
     plt.figure(figsize=(10, 7))
@@ -54,4 +54,6 @@ def plot_amplitude_spectra(freqs, amps, names):
               ', '.join([name for name in names[:-1]]) +
               f' and {names[-1]}', fontsize=16)
     plt.legend(fontsize=12)
+    if caption is not None:
+        plt.figtext(0.5, 0.01, f'{caption}', wrap=True, horizontalalignment='center')
     plt.show()

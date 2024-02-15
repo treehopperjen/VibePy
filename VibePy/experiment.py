@@ -8,13 +8,17 @@ import calibration
 import playback
 
 
-# EXPERIMENT
 class Experiment:
+    """
+    Experiment
+    This class holds information about the playback experiment and 
+    functions for compensating, calibrating, and playing stimuli.
+    """
     def __init__(self, experiment_name):
         self.name = experiment_name
-        self.audiointerface = None
-        self.transducers = None
-        self.stimulus = None
+        self.audiointerface = None # class
+        self.transducers = None # class
+        self.stimulus = None # class
         self.compensation_filter = None
         self.compensated_filename = None
         self.calibration_mulitplier = None
@@ -32,42 +36,56 @@ class Experiment:
             filename, fs, fft, low_freq, high_freq, target_amp)
 
     def generate_compensation_filter(self):
-        # get parameters
+        """
+        generate_compensation_filter
+        Runs compensation.py
+        """
+        # Get parameters
         filename = self.stimulus.get_filename()
         fs, fft = self.stimulus.get_sampling_parameters()
         low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
 
-        # run compensation to get filter
+        # Calculate compensation filter and compensated stimulus
         self.compensation_filter, self.compensated_filename = \
             compensation.main(
                 fs, fft, low_freq, high_freq,
                 device_num, input_channel, output_channel, filename)
 
     def generate_calibration_multiplier(self):
-        # use the compensated file if there is one, if not use the original file
+        """
+        generate_calibration_multiplier
+        Runs calibration.py
+        """
+        # Use the compensated file if there is one, if not use the original file
         if self.compensated_filename is not None:
             filename = self.compensated_filename
         else:
             filename = self.stimulus.get_filename()
-        # get parameters
+        
+        # Get parameters
+        original_file = self.stimulus.get_filename()
         fs, fft = self.stimulus.get_sampling_parameters()
-        # low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
         target_amp = self.stimulus.get_amplitude_parameter()
         amp_conversion = self.transducers.get_sensor_conversion()
-        amp_units = self.transducers.get_sensor_units()
-        # run calibration to get multiplier
+        low_freq, high_freq = self.stimulus.get_frequency_parameters()
+
+        # Calculate calibration multiplier and calibrated stimulus
         self.calibration_mulitplier, self.calibrated_filename = \
             calibration.main(
-                fs,
+                fs, original_file,
                 device_num, input_channel, output_channel, filename,
-                target_amp, amp_conversion, amp_units)
+                target_amp, amp_conversion, fft, low_freq, high_freq)
 
     def play_for_experiment(self):
-        # use the calibrated file if there is one, if not use the compensated
+        """
+        play_for_experiment
+        Runs playback.py
+        """
+        # Use the calibrated file if there is one, if not use the compensated
         # file, if not use the original file
         if self.calibrated_filename is not None:
             filename = self.calibrated_filename
@@ -75,12 +93,13 @@ class Experiment:
             filename = self.compensated_filename
         else:
             filename = self.stimulus.get_filename()
-        # get parameters
+
+        # Get parameters
         fs, fft = self.stimulus.get_sampling_parameters()
-        # low_freq, high_freq = self.stimulus.get_frequency_parameters()
         device_num = self.audiointerface
         input_channel, output_channel = self.transducers.get_channels()
-        # run playback to play vibrational stimulus
+
+        # Play vibrational stimulus
         playback.main(filename, fs, device_num, input_channel, output_channel)
 
     def __str__(self):
@@ -88,16 +107,19 @@ class Experiment:
 {self.name}
 
 Hardware Parameters
-Audiointerface device num: {self.audiointerface}{
+Device num: {self.audiointerface}{
             '' if self.transducers is None else self.transducers}
 
-Stimulus and Signal Parameters{
+Stimulus and Signal Parameters\n{
             '' if self.stimulus is None else self.stimulus}"""
                 )
 
 
 class TransducerPair:
-
+    """
+    TransucerPair
+    This class contains information related to the playback device and sensor.
+    """
     sensor_options = [
         [0, 'accelerometer 100 mV/G (1x gain)', 'm/s^2', 98],
         [1, 'accelerometer 100 mV/G (10x gain)', 'm/s^2', 9.8],
@@ -143,6 +165,11 @@ Sensor amplitude conversion: {sensor_amp_conversion}"""
 
 
 class Stimulus:
+    """
+    Stimulus
+    This class contains information related to the stimulus and
+    its signal parameters. 
+    """
     def __init__(self, filename, fs, fft, low_freq, high_freq, target_amp):
         self.filename = filename
         self.fs = fs
@@ -172,6 +199,6 @@ fft: {self.fft}
 low frequency: {self.low_freq}
 high frequency: {self.high_freq}
 """ +
-            '' if self.target_amp is None else
-            f'target amplitude: {self.target_amp}'
+            ('' if self.target_amp is None else
+            f'target amplitude: {self.target_amp}')
                )

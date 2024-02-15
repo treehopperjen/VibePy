@@ -5,11 +5,11 @@ target amplitude, and applies that multiplier to the stimulus.
 """
 
 import soundfile as sf
-import sounddevice as sd
 import os
 import numpy as np
+from scipy import signal
 from playback import play_and_record
-from plotting import plot_waveforms
+from plotting import plot_waveforms, plot_amplitude_spectra
 
 
 def generate_click(fs):
@@ -34,7 +34,7 @@ def get_time_delay(fs, device, input_channel, output_channel):
     recorded_click = play_and_record(
         click, fs, device, input_channel, output_channel,
         with_padding=True)
-    sd.wait()
+
     # get time delay
     time_delay = np.argmax(recorded_click)-fs
     return time_delay
@@ -136,13 +136,40 @@ def find_peaks(recording_of_ladder, recording_segment_locations,
         for start, end in recording_segment_locations
     ]
 
+def get_amplitude_spectrum(sound, fs, nfft, lo_hi=None):
+    """
+    get_amplitude_spectrum
+    Generates an amplitude spectrum of a selection of sound.
+    """
+    # `frequencies` is frequency samples of amplitude spectrum
+    # `amplitudes` is power spectral density of amplitude spectrum
+    frequencies, amplitudes = signal.welch(
+        sound, fs, window='hamming',
+        nperseg=nfft, scaling='spectrum', detrend=False)
 
-def main(fs, device_num, input_channel, output_channel,
-         filename, target_amp, amp_conversion, amp_units):
+    if lo_hi is not None:   # Limit bandwidth, if requested
+        frequencies = frequencies[lo_hi[0]:lo_hi[1]]
+        amplitudes = amplitudes[lo_hi[0]:lo_hi[1]]
+
+    return frequencies, np.power(amplitudes, 0.5)
+
+def frequency2samples(freq, fs, fft):
+    """
+    frequency2samples
+    Converts Hz to samples
+    """
+    return int(np.floor(freq/(fs/fft)))
+
+def main(fs, original_filename, device_num, input_channel, output_channel, 
+         filename, target_amp, amp_conversion, fft, low_freq, high_freq):
 
     print(f'Calibrating {filename}')
-
+    original_stimulus, original_fs = sf.read(original_filename)
     playback, playback_fs = sf.read(filename)
+
+    # convert the units of low and high frequency from Hz to samples
+    lo = frequency2samples(low_freq, fs, fft)
+    hi = frequency2samples(high_freq, fs, fft)
 
     # calculate the time delay between the playback and recording
     time_delay = get_time_delay(fs, device_num, input_channel, output_channel)
@@ -193,24 +220,41 @@ def main(fs, device_num, input_channel, output_channel,
         with_padding=True)
 
     # Convert amplitude
-    stim1 = playback * amp_conversion
-    stim2 = recording_of_calibrated_playback * amp_conversion
+    stim1 = original_stimulus * amp_conversion # stimulus
+    stim2 = recording_of_calibrated_playback * amp_conversion # recording of calibrated stimylus
+    stim3 = calibrated_playback * amp_conversion # calibrated stimulus
+    amp_adjusted_stim1 = stim1 * (max(stim2)/max(stim1)) # equalize amplitudes to facilitate comparison of spectra
 
     # Determine peak
-    measured_peak1 = round(max(abs(stim1)), 2)
     measured_peak2 = round(max(abs(stim2)), 2)
 
     # Plot
     plot_waveforms(
         fs, stim1, stim2,
         'Amplitude',
-        f'Waveform of Stimulus.\nMeasured peak: {measured_peak1}',
+        f'Waveform of Stimulus.',
         'Waveform of Recorded, Calibrated Stimulus.\n'
-        f'Measured peak: {measured_peak2}. Target: {target_amp}')
-    
+        f'Measured peak: {measured_peak2}.'
+        f'Target: {target_amp}.')
+
+    stim1_freq, stim1_amp = get_amplitude_spectrum(amp_adjusted_stim1, fs, fft, [lo, hi]) # stimulus
+    stim2_freq, stim2_amp = get_amplitude_spectrum(stim2, fs, fft, [lo, hi]) # calibrated stimulus
+
+    plot_amplitude_spectra(
+            [stim1_freq, stim2_freq],
+            [stim1_amp, stim2_amp],
+            ['Stimulus', 'Calibrated Stimulus'])
+
     # save calibrated stimulus
     file_basename = os.path.splitext(filename)[0]
     calibrated_filename = f'calibrated_{file_basename}.wav'
     sf.write(calibrated_filename, calibrated_playback, fs)
+
+    # check for clipping
+    if max(abs(calibrated_playback)>=1):
+        clipping_message = """NOTE: the saved stimulus file is clipped. 
+            Consider re-running the compensation & calibration procedure after increasing 
+            the amplifier gain or lowering the target amplitude."""
+        print(clipping_message) 
     
     return multiplier, calibrated_filename

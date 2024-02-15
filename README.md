@@ -23,6 +23,7 @@ Instructions for setting up the tool and using these features are described belo
 - Run `application.py`
 
 ### Using VibePy
+VibePy is a command-line interface application that is run from `application.py`. First, enter parameters of the experiment (see the article cited above) and then select which features to use. The features can be used individually or together. When used together, they will execute in the following order:
 
     1. Measure and compensate for filtering
     2. Calibrate playback amplitude

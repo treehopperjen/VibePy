@@ -79,7 +79,8 @@ def get_compensation_filter(playback, recording, fs, nfft, lo, hi):
     # This ratio is the inverse of the unwanted filtering
     amp_ratio = np.divide(playback_amp, recording_amp)
     # zero out of range frequencies
-    amp_ratio[0:lo-10] = 0
+    if lo-1 > 0:
+        amp_ratio[0:lo-1] = 0
     amp_ratio[hi+10: len(amp_ratio)] = 0
     
     # Make a frequency vector for the filter

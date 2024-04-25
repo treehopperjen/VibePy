@@ -157,8 +157,8 @@ def main(fs, fft, low_freq, high_freq, device, input_channel, output_channel,
             recording_of_compensated_noise, fs, fft, [lo, hi])
         
         spectral_difference = 20*np.log10(stim1_amp) - (20*np.log10(stim2_amp) + np.mean(20*np.log10(stim1_amp)) - np.mean(20*np.log10(stim2_amp)))
-        max_diff = round(np.max(abs(spectral_difference)))
-        average_diff = round(np.mean(spectral_difference))
+        max_diff = round(np.max(abs(spectral_difference)), 1)
+        average_diff = round(np.mean(spectral_difference), 1)
         print(f'\nDifference between spectra: \navgerage difference = {average_diff} dB \nmax difference = {max_diff} dB')
 
         plot_amplitude_spectra(

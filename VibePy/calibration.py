@@ -235,8 +235,8 @@ def main(fs, original_filename, device_num, input_channel, output_channel,
         'Amplitude',
         f'Waveform of Stimulus.',
         'Waveform of Recorded, Calibrated Stimulus.\n'
-        f'Measured peak: {measured_peak2}.'
-        f'Target: {target_amp}.'
+        f'Measured peak: {measured_peak2}. | '
+        f'Target: {target_amp}. | '
         f' Difference (dB): {diff}')
 
     stim1_freq, stim1_amp = get_amplitude_spectrum(amp_adjusted_stim1, fs, fft, [lo, hi]) # stimulus

@@ -227,6 +227,7 @@ def main(fs, original_filename, device_num, input_channel, output_channel,
 
     # Determine peak
     measured_peak2 = round(max(abs(stim2)), 2)
+    diff = round(20*np.log10(measured_peak2/target_amp),1)
 
     # Plot
     plot_waveforms(
@@ -234,8 +235,9 @@ def main(fs, original_filename, device_num, input_channel, output_channel,
         'Amplitude',
         f'Waveform of Stimulus.',
         'Waveform of Recorded, Calibrated Stimulus.\n'
-        f'Measured peak: {measured_peak2}.'
-        f'Target: {target_amp}.')
+        f'Measured peak: {measured_peak2}. | '
+        f'Target: {target_amp}. | '
+        f' Difference (dB): {diff}')
 
     stim1_freq, stim1_amp = get_amplitude_spectrum(amp_adjusted_stim1, fs, fft, [lo, hi]) # stimulus
     stim2_freq, stim2_amp = get_amplitude_spectrum(stim2, fs, fft, [lo, hi]) # calibrated stimulus

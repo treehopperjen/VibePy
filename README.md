@@ -40,7 +40,7 @@ The code for this module is in [compensation.py](https://github.com/treehopperje
 - Applying the digital filter to the noise to create compensated noise
 - Playing and recording the compensated noise to evaluate whether the digital filter worked
 
-**Evaluation:** If the compensation filter is accurate, the shape of the amplitude spectra of the original noise and the recorded, compensated noise should match. Otherwise, another round of compensation may be necessary to fine-tune the compensation filter. Note that the overall amplitude of the noise and the recorded, compensated noise may differ because playback amplitude has not been calibrated yet. 
+**Evaluation:** If the compensation filter is accurate, the shape of the amplitude spectra of the original noise and the recorded, compensated noise should match. Otherwise, another round of compensation may be necessary to fine-tune the compensation filter. Note that the overall amplitude of the noise and the recorded, compensated noise may differ because playback amplitude has not been calibrated yet. The average and maximum difference between the spectra will be provided on the screen (with the overall average amplitude difference removed). As a rule of thumb, if the maximum difference is more than 3 dB you should answer 'y' when you see the prompt 'Would you like to compensate again?' If after repeated iterations the maximum difference is still >3 dB, there may be excessive environmental noise and / or the playback amplitude may be too low.
 
 **Calibrate playback amplitude**
 
@@ -53,6 +53,8 @@ The code for this module is in [calibration.py](https://github.com/treehopperjen
 - Generating a ladder of modulated peaks that increase in amplitude
 - Playing and recording the ladder of modulated peaks
 - Using the recording of the peaks to estimate the multiplier
+
+**Evaluation:** If the compensation and calibration process has been successful, the spectra of the original stimulus and the recording of the played-back (compensated & calibrated) stimulus will be superimposed with only small amplitude variations over the desired frequency range. Likewise, the target and measured amplitudes should be close, usually well under 3 dB. As a final test, the authors generally record the playback of the calibrated stimulus and listen to it along with the original; the two should sound virtually indistinguishable aside from minor differences in background noise.
 
 **Play vibrational stimuli**
 

@@ -8,6 +8,7 @@ from os import path
 import sounddevice as sd
 from controller import Controller
 from experiment import TransducerPair
+from datetime import datetime
 
 
 # PRINT FORMATTING
@@ -99,6 +100,8 @@ def main():
 
 def request_experiment_name():
     experiment_name = input(f'Experiment name: ')
+    if experiment_name == "":
+        experiment_name = datetime.now().strftime("%d%m%Y %H: %M: %S")
     return experiment_name
 
 

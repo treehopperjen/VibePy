@@ -3,7 +3,7 @@
 
 Implementation of the tool described in
 
-Evora AJ, Cocroft RB, Madhusudhana S, Hamel JA. (2024). Vibe-Py: An open-source tool for conducting high-fidelity vibrational playbacks. Invited submission. Entomologia Experimentalis et Applicata. 00: 1–8. doi: 10.1111/eea.13500.
+Evora AJ, Cocroft RB, Madhusudhana S, Hamel JA. (2024). Vibe-Py: An open-source tool for conducting high-fidelity vibrational playbacks. Entomologia Experimentalis et Applicata. 00: 1–8. doi: 10.1111/eea.13500.
 
 for performing vibrational playback experiments.
 

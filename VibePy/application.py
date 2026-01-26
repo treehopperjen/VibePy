@@ -203,11 +203,13 @@ def get_testing_parameter(file_name, parameter):
 
             for line in file:
                 try:
-                    parameter_name, _, rhs = line.split(' ')
+                    parameter_name, rhs = map(str.strip, line.split("=", 1))
                     if parameter_name == parameter:
                         return rhs.replace('\n', '')
                 except Exception as exc:
+                    
                     pass
+                    
 
             # Reached end of file. Complain!
             print(f'Could not find {parameter} in testing_parameters.txt.\n'

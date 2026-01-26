@@ -164,6 +164,8 @@ def main(fs, original_filename, device_num, input_channel, output_channel,
          filename, target_amp, amp_conversion, fft, low_freq, high_freq):
 
     print(f'Calibrating {filename}')
+    # print(f'with {amp_conversion} amplitude conversion') # debug
+
     original_stimulus, original_fs = sf.read(original_filename)
     playback, playback_fs = sf.read(filename)
 

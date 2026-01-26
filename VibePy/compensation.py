@@ -137,7 +137,7 @@ def main(fs, fft, low_freq, high_freq, device, input_channel, output_channel,
         # Plot
         plot_waveforms(
             fs, noise, recording_of_noise,
-            'relative dB',
+            'Amplitude',
             'Waveform of Noise',
             'Waveform of Recorded Noise')
         # generate a digital filter that compensates for unwanted filtering
